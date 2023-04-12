@@ -14,7 +14,7 @@
         </li>
         <li class="breadcrumbs__item">
           <a class="breadcrumbs__link">
-            Смартфон Xiaomi Mi Mix 3 6/128GB
+            {{ product.title }}
           </a>
         </li>
       </ul>
