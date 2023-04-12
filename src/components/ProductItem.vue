@@ -1,7 +1,7 @@
 <template>
     <li class="catalog__item"   >
     
-    <a class="catalog__pic" href="#">
+    <a class="catalog__pic" href="#" @click.prevent="route('product', { id: product.id})">
            <img :src="product.image"  :alt="product.title">
      </a>
 
@@ -12,7 +12,7 @@
          </h3>
 
          <span class="catalog__price">
-           {{ product.price }} ₽
+           {{ product.price | numberFormat }} ₽
          </span>
         
         <ul class="colors colors--black">
@@ -29,12 +29,22 @@
 </template>
     
 <script>    
-    export default {    
+import eventBus from '@/eventBus'   
+import route from '@/helpers/route'
+import numberFormat from '@/helpers/numberFormat'
+
+export default {    
          data() {
            return {
               currentColor : '' 
            }  
          }, 
-         props: ['product'],                  
+         props: ['product'],   
+         methods: {
+            route
+         },
+        filters:  {
+            numberFormat
+        }
     }
 </script>
