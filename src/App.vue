@@ -64,7 +64,7 @@ export default {
             }
             
             if (this.filteredColor) {
-                filteredProducts = filteredProducts.filter( product => product.color ==  this.filteredColor)
+                filteredProducts = filteredProducts.filter( product => product.colors.includes(this.filteredColor))
             }
             
             this.page = 1 
