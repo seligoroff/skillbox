@@ -15,7 +15,7 @@
             </label>
           </fieldset>
 
-          <fieldset class="form__block">
+            <fieldset class="form__block" v-if="categories.length > 0">
             <legend class="form__legend">Категория</legend>
             <label class="form__label form__label--select">
               <select class="form__select" type="text" name="category" v-model.number="currentCategoryId">
@@ -51,6 +51,8 @@
 <script>
     import categories from '../data/categories'
     import colors from '../data/colors'
+    import axios from 'axios'
+    import {API_BASE_URL} from '@/config'
     
     export default {
           props:['page', 'priceFrom', 'priceTo', 'categoryId', 'color'],  
@@ -59,7 +61,8 @@
                   currentColor: '',
                   currentPriceFrom: 0,
                   currentPriceTo: 0,
-                  currentCategoryId: 0
+                  currentCategoryId: 0,
+                  categoriesData: null
               }
           },
           methods: {
@@ -74,6 +77,10 @@
                 this.$emit('update:priceFrom', this.currentPriceFrom);
                 this.$emit('update:priceTo', this.currentPriceTo);
                 this.$emit('update:categoryId', this.currentCategoryId);                
+            },
+            loadCategories() {
+                axios.get(API_BASE_URL + '/api/productCategories').
+                  then(response => this.categoriesData = response.data);
             }
           },
           watch: {
@@ -84,7 +91,7 @@
                   this.currentPriceTo = value;
               },
               categoryId(value) {
-                  this.currentCategoryId = value;
+                  this.currentCategoryId = value;                  
               },
               color(value) {
                   this.currentColor = value;
@@ -99,12 +106,15 @@
                       this.$emit('update:page', value)
                   }
               },
-              categories() {
-                  return categories
+              categories() { 
+                  return this.categoriesData ? this.categoriesData.items : []; 
               },
               colors() {
                   return colors
               }
-          }  
+          },
+          created() {
+              this.loadCategories();
+          }
     }
 </script>

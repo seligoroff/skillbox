@@ -1,5 +1,7 @@
 <template>
-      <main class="content container">
+    <main class="content container" v-if="productLoading">Загрузка товара...</main>
+    <main class="content container" v-else-if="productLoadingFailed">Ошибка загрузки!</main>
+    <main class="content container" v-else-if="productData">
     <div class="content__top">
       <ul class="breadcrumbs">
         <li class="breadcrumbs__item">
@@ -188,13 +190,18 @@ import categories from '@/data/categories'
 import eventBus from '@/eventBus'
 import route from '@/helpers/route'
 import numberFormat from '@/helpers/numberFormat'
+import axios from 'axios'
+import {API_BASE_URL, DEFAULT_API_TIMEOUT_LIMIT} from '@/config'
 
 export default {    
     props: ['pageParams'],    
     data() {
         return {
             currentProductColor: '',
-            amount: 1
+            amount: 1,
+            productData: null,
+            productLoading: false,
+            productLoadingFailed: false
         }
     },
     methods: {
@@ -209,6 +216,18 @@ export default {
         },
         addToCart() {
             this.$store.commit('addProductToCart', { productId: this.product.id, amount: this.amount });            
+        },
+        loadProduct() {
+            this.productLoading = true; 
+            this.productLoadingFailed = false;
+                        
+            axios.get(API_BASE_URL + '/api/products/' + this.$route.params.id)
+                .then(response => this.productData = {
+                    ...response.data,
+                    image: response.data.image.file.url
+                })
+                .catch(() => this.productLoadingFailed = true)
+                .then(this.productLoading = false);
         }
     },
     filters: {
@@ -216,10 +235,18 @@ export default {
     },
     computed: {
         product() {
-            return products.find( product => product.id == this.$route.params.id);
+            return this.productData ? this.productData : null;
         },
         category() {
-            return categories.find( category => category.id == this.product.categoryId)
+            return this.product.category;
+        }
+    },   
+    watch: {
+        '$route.params.id': {
+            handler() {
+                this.loadProduct();
+            },
+            immediate: true
         }
     }
 }

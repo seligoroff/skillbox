@@ -13,6 +13,8 @@
         
       <ProductsFilter :color.sync="filteredColor" :page.sync="page" :price-from.sync="filteredPriceFrom" :price-to.sync="filteredPriceTo" :category-id.sync="filteredCategoryId" />        
       <section class="catalog">         
+          <div v-show="productsLoading">Загрузка товаров... </div> 
+          <div v-show="productsLoadingFailed">Ошибка загрузки товаров... <button @click.prevent="loadProducts">Попробовать еще раз</button></div> 
            <ProductList :products="products"  />
            <BasePagination v-model.sync="page" :per-page="productsPerPage" :count="countProducts"/>  
       </section>
@@ -26,7 +28,8 @@ import products from '@/data/products'
 import ProductList from '@/components/ProductList'
 import ProductsFilter from '@/components/ProductsFilter'
 import BasePagination from '@/components/BasePagination'
-
+import axios from 'axios'
+import {API_BASE_URL, DEFAULT_API_TIMEOUT_LIMIT} from '@/config'
 
 export default {    
     components: {
@@ -41,39 +44,61 @@ export default {
             filteredCategoryId: 0,
             filteredColor: '',
             page: 1,
-            productsPerPage: 3            
+            productsPerPage: 3,
+            productsData: null,
+            productsLoading: false,
+            productsLoadingFailed: false
         }
     },
-    computed:  {
-        filteredProducts() {
-            let filteredProducts = products
-
-            if (this.filteredPriceFrom > 0) {
-                filteredProducts = filteredProducts.filter( product => product.price >=  this.filteredPriceFrom)
-            }
-            
-            if (this.filteredPriceTo > 0) {
-                filteredProducts = filteredProducts.filter( product => product.price <=  this.filteredPriceTo)
-            }
-            
-            if (this.filteredCategoryId > 0) {
-                filteredProducts = filteredProducts.filter( product => product.categoryId ==  this.filteredCategoryId)
-            }
-            
-            if (this.filteredColor) {
-                filteredProducts = filteredProducts.filter( product => product.colors.includes(this.filteredColor))
-            }
-            
-            this.page = 1 
-            return filteredProducts
-        },
-        products () {
-            const offset = (this.page - 1) * this.productsPerPage;
-            return this.filteredProducts.slice(offset, offset + this.productsPerPage);
-        },
+    computed:  {      
+        products () {            
+            return this.productsData ? this.productsData.items.map( product => {
+                return {
+                    ...product,
+                    image: product.image.file.url
+                } 
+            }) : [];
+        }, 
         countProducts() {
-            return this.filteredProducts.length
+            return this.productsData ? this.productsData.pagination.total :  0;
         }
+    },
+    methods: {
+        loadProducts() {
+        this.productsLoading = true;    
+        this.productsLoadingFailed = false;
+        clearTimeout(this.loadProductsTimer);    
+        this.loadProductsTimer = setTimeout(() => {axios.get(API_BASE_URL + '/api/products', {
+                params: {
+                    page: this.page,
+                    limit: this.productsPerPage,
+                    categoryId: this.filteredCategoryId,
+                    minPrice: this.filteredPriceFrom,
+                    maxPrice: this.filteredPriceTo 
+                }
+            })
+                .then(response => this.productsData = response.data)                
+                .catch(() => this.productsLoadingFailed = true)
+                .then(() => this.productsLoading = false);
+            },DEFAULT_API_TIMEOUT_LIMIT);
+        }
+    },
+    watch: {
+        page() {
+            this.loadProducts();
+        },
+        filteredPriceFrom () {
+            this.loadProducts();
+        },
+        filteredPriceTo() {
+            this.loadProducts();
+        },
+        filteredCategoryId() {
+            this.loadProducts();
+        }
+    },
+    created() {
+        this.loadProducts();
     }
 }        
 </script>
