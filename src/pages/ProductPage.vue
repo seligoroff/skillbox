@@ -127,6 +127,9 @@
                 В корзину
               </button>
             </div>
+              
+              <div v-if="productAdded">Товар добавлен</div>
+              <div v-else-if="productAddSending">Добавляем товар...</div>
           </form>
         </div>
       </div>
@@ -192,6 +195,7 @@ import route from '@/helpers/route'
 import numberFormat from '@/helpers/numberFormat'
 import axios from 'axios'
 import {API_BASE_URL, DEFAULT_API_TIMEOUT_LIMIT} from '@/config'
+import { mapActions } from 'vuex'
 
 export default {    
     props: ['pageParams'],    
@@ -201,10 +205,13 @@ export default {
             amount: 1,
             productData: null,
             productLoading: false,
-            productLoadingFailed: false
+            productLoadingFailed: false,
+            productAdded: false,
+            productAddSending: false
         }
     },
     methods: {
+        ...mapActions(['addProductToCart']),
         route,
         addAmount() {
             ++ this.amount;
@@ -215,7 +222,13 @@ export default {
             }
         },
         addToCart() {
-            this.$store.commit('addProductToCart', { productId: this.product.id, amount: this.amount });            
+            this.productAdded = false;
+            this.productAddSending =  true;
+            this.addProductToCart({ productId: this.product.id, amount: this.amount })
+                .then(() => {
+                    this.productAdded = true;
+                    this.productAddSending =  false;
+                });            
         },
         loadProduct() {
             this.productLoading = true; 

@@ -40,7 +40,7 @@
 </template>
 <script>
 import  numberFormat from '@/helpers/numberFormat'    
-import { mapMutations } from 'vuex'
+import { mapActions } from 'vuex'
 
 export default {
      props: ['item'],
@@ -59,12 +59,12 @@ export default {
              },
              set(value) {
                  
-                 this.$store.commit('updateCartAmount', { productId: this.item.productId, amount: value })
+                 this.$store.dispatch('updateCartProductAmount', { productId: this.item.productId, amount: value })
              }        
          }
      },
      methods: {
-         ...mapMutations({remove: 'removeElement'}),
+         ...mapActions({remove: 'removeCartProduct'}),
          reduce() {
              if (this.amount > 1 ) {
                  -- this.amount
