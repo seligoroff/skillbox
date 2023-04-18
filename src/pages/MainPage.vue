@@ -88,20 +88,16 @@ export default {
         page() {
             this.loadProducts();
         },
-        filteredPriceFrom () {
-            console.log('filteredPriceFrom')
+        filteredPriceFrom () {            
             this.loadProducts();
         },
-        filteredPriceTo() {
-            console.log('filteredPriceTo')
+        filteredPriceTo() {            
             this.loadProducts();
         },
-        filteredCategoryId() {
-            console.log('filteredCategoryId')
+        filteredCategoryId() {            
             this.loadProducts();
         },
-        filteredColor() {
-            console.log('filteredColor')
+        filteredColor() {            
             this.loadProducts();
         }
     },
