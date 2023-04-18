@@ -74,7 +74,8 @@ export default {
                     limit: this.productsPerPage,
                     categoryId: this.filteredCategoryId,
                     minPrice: this.filteredPriceFrom,
-                    maxPrice: this.filteredPriceTo 
+                    maxPrice: this.filteredPriceTo,
+                    colorId: this.filteredColor
                 }
             })
                 .then(response => this.productsData = response.data)                
@@ -88,12 +89,19 @@ export default {
             this.loadProducts();
         },
         filteredPriceFrom () {
+            console.log('filteredPriceFrom')
             this.loadProducts();
         },
         filteredPriceTo() {
+            console.log('filteredPriceTo')
             this.loadProducts();
         },
         filteredCategoryId() {
+            console.log('filteredCategoryId')
+            this.loadProducts();
+        },
+        filteredColor() {
+            console.log('filteredColor')
             this.loadProducts();
         }
     },

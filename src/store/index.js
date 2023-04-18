@@ -10,7 +10,7 @@ export default new Vuex.Store({
       cartProducts: [          
       ],
       userAccessKey: null,
-      cartProductsData: []
+      cartProductsData: [],      
   },
   mutations: {
       updateCartAmount(state, {productId, amount}) {
@@ -32,12 +32,14 @@ export default new Vuex.Store({
                   amount: item.quantity
               }
           })
-      }
+      },
+      setColors(state, colors) {
+          state.colors = colors;
+      } 
   },
   actions: {
        loadCart(context) {
-            axios
-                .get(API_BASE_URL + '/api/baskets', {
+            return axios.get(API_BASE_URL + '/api/baskets', {
                     params: {
                         userAccessKey: context.state.userAccessKey
                     }
@@ -50,7 +52,10 @@ export default new Vuex.Store({
                     
                     context.commit('updateCartProductData', response.data.items);
                     context.commit('syncCartProducts');
-                })                        
+                });                        
+      },
+      loadColors(context) {
+          return axios.get(API_BASE_URL + '/api/colors');
       },
       addProductToCart(context, {productId, amount}) {
           return axios.post(API_BASE_URL + '/api/baskets/products', {
@@ -64,7 +69,7 @@ export default new Vuex.Store({
         .then(response => {
             context.commit('updateCartProductData', response.data.items);
             context.commit('syncCartProducts');
-        })
+        });
       },
       updateCartProductAmount(context, {productId, amount}) {
         context.commit('updateCartAmount', {productId, amount});
@@ -88,9 +93,7 @@ export default new Vuex.Store({
         })
       }, 
       removeCartProduct(context, productId) {
-          
-        
-        
+
         return axios.delete(API_BASE_URL + '/api/baskets/products',  {
               params: {
                   userAccessKey: context.state.userAccessKey

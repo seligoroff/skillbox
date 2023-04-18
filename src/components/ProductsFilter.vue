@@ -30,8 +30,8 @@
             <ul class="colors">
               <li class="colors__item" v-for="colorItem in colors">
                 <label class="colors__label">
-                  <input class="colors__radio sr-only" type="radio"  :value="colorItem" v-model="currentColor">
-                  <span class="colors__value" :style="'background-color:' + colorItem">
+                  <input class="colors__radio sr-only" type="radio"  :value="colorItem.id" v-model="currentColor">
+                  <span class="colors__value" :style="'background-color:' + colorItem.code">
                   </span>
                 </label>
               </li>
@@ -53,6 +53,7 @@
     import colors from '../data/colors'
     import axios from 'axios'
     import {API_BASE_URL} from '@/config'
+    import {mapActions} from 'vuex'
     
     export default {
           props:['page', 'priceFrom', 'priceTo', 'categoryId', 'color'],  
@@ -62,10 +63,12 @@
                   currentPriceFrom: 0,
                   currentPriceTo: 0,
                   currentCategoryId: 0,
-                  categoriesData: null
+                  categoriesData: null,
+                  colorsData:[]
               }
           },
           methods: {
+            ...mapActions(['loadColors']),  
             reset() {
                 this.$emit('update:color', '');
                 this.$emit('update:priceFrom', 0);
@@ -110,11 +113,13 @@
                   return this.categoriesData ? this.categoriesData.items : []; 
               },
               colors() {
-                  return colors
+                  return this.colorsData;
               }
           },
           created() {
               this.loadCategories();
+              this.loadColors().
+                then(response => this.colorsData = response.data.items);
           }
     }
 </script>
