@@ -33,7 +33,7 @@
           </ul>
         </div>
 
-        <div class="cart__block">
+        <div class="cart__block" v-if="cartAmount">
           <p class="cart__desc">
             Мы&nbsp;посчитаем стоимость доставки на&nbsp;следующем этапе
           </p>
@@ -41,9 +41,9 @@
             Итого: <span>{{ fullPrice | numberFormat }} ₽</span>
           </p>
 
-          <button class="cart__button button button--primery" type="submit">
+          <router-link tag="button" class="cart__button button button--primery" type="submit" :to="{name: 'order'}" >
             Оформить заказ
-          </button>
+          </router-link>
         </div>
       </form>
     </section>
